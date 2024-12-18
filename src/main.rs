@@ -1,6 +1,5 @@
 use eframe::egui;
-//use rand::Rng;
-use std::{thread, time::Duration};
+use std::{sync::{Arc, Mutex}, thread, time::Duration};
 
 fn main() -> Result<(), eframe::Error> {
     let options = eframe::NativeOptions::default();
@@ -12,20 +11,22 @@ fn main() -> Result<(), eframe::Error> {
 }
 
 struct MyApp {
-    score: i32,
+    score: Arc<Mutex<i32>>,
     x: i32,
     upgd_cost: i32,
     proc: i32,
-    constt: i32,
-   // rand_number: i32
+    autoclicker_running: Arc<Mutex<bool>>,
 }
 
 impl Default for MyApp {
     fn default() -> Self {
-        //let mut rng = rand::thread_rng();
-        //let rand_number = rng.gen_range(1..=50);
-        Self { score: 0, x: 1, upgd_cost: 10, proc: 0, constt: 0}
-
+        Self {
+            score: Arc::new(Mutex::new(0)),
+            x: 1,
+            upgd_cost: 10,
+            proc: 0,
+            autoclicker_running: Arc::new(Mutex::new(false)),
+        }
     }
 }
 
@@ -41,39 +42,41 @@ impl eframe::App for MyApp {
             ctx.set_style(style);
 
             // Display the score
-            ui.heading(format!("Score: {}", self.score));
+            ui.heading(format!("Score: {}", *self.score.lock().unwrap()));
             ui.heading(format!("Upgrade cost: {}", self.upgd_cost));
             ui.heading(format!("Autoclicker cost: {}", self.upgd_cost));
 
             // Buttons
             if ui.button("Click").clicked() {
-                self.score += self.x;
+                *self.score.lock().unwrap() += self.x;
             }
 
             if ui.button("Upgrade").clicked() {
-                if self.score >= self.upgd_cost {
-                    self.score = self.score - self.upgd_cost;
-                    self.x = self.x + 1;
-                    self.proc = self.score * 40/100 + self.upgd_cost * 10/100;
-                    self.upgd_cost = self.upgd_cost + self.proc;
-
+                let mut score = self.score.lock().unwrap();
+                if *score >= self.upgd_cost {
+                    *score -= self.upgd_cost;
+                    self.x += 1;
+                    self.proc = *score * 40 / 100 + self.upgd_cost * 10 / 100;
+                    self.upgd_cost += self.proc;
                 }
-                
-
             }
 
             if ui.button("Autoclick").clicked() {
-                if self.score >= self.upgd_cost {
-                    while self.constt == self.constt {
-                        thread::sleep(Duration::from_millis(4000));
-                        self.score = self.score + self.x
-
-
-
-                    }
-
+                let mut autoclicker_running = self.autoclicker_running.lock().unwrap();
+                if *self.score.lock().unwrap() >= self.upgd_cost && !*autoclicker_running {
+                    *autoclicker_running = true;
+                    let score_arc = Arc::clone(&self.score);
+                    let x = self.x;
+                    thread::spawn(move || {
+                        loop {
+                            {
+                                let mut score = score_arc.lock().unwrap();
+                                *score += x;
+                            }
+                            thread::sleep(Duration::from_secs(4));
+                        }
+                    });
                 }
-
             }
         });
     }

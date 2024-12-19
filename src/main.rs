@@ -1,5 +1,6 @@
 use eframe::egui;
 use std::{sync::{Arc, Mutex}, thread, time::Duration};
+pub mod net;
 
 fn main() -> Result<(), eframe::Error> {
     let options = eframe::NativeOptions::default();

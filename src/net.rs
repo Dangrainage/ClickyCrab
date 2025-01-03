@@ -6,6 +6,8 @@ use std::sync::mpsc::{channel, Sender};
 use std::collections::VecDeque;
 
 
+pub mod networking {
+
 pub fn network() -> Sender<Vec<i64>> {
     let (tx, rx) = channel();
     let tx: Sender<Vec<i64>> = tx.clone();
@@ -72,4 +74,5 @@ pub fn debug(tx: Sender<Vec<i64>>) -> Sender<Vec<i64>> {
     tx
 }
 
+}
 

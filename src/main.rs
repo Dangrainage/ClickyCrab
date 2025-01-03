@@ -1,6 +1,8 @@
 use eframe::egui;
 use std::{sync::{Arc, Mutex}, thread, time::Duration};
-pub mod net;
+mod net;
+
+pub use crate::net::networking;
 
 fn main() -> Result<(), eframe::Error> {
     let options = eframe::NativeOptions::default();

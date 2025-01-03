@@ -1,3 +1,5 @@
+pub mod networking {
+
 use std::thread::sleep;
 use std::thread;
 use std::net::UdpSocket;
@@ -5,8 +7,6 @@ use std::time::Duration;
 use std::sync::mpsc::{channel, Sender};
 use std::collections::VecDeque;
 
-
-pub mod networking {
 
 pub fn network() -> Sender<Vec<i64>> {
     let (tx, rx) = channel();

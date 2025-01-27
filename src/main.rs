@@ -2,12 +2,13 @@ use eframe::egui;
 use std::{sync::{Arc, Mutex}, thread, time::Duration};
 mod net;
 
-pub use crate::net::networking;
+pub use crate::net::network;
+pub use crate::net::send_score;
 
 fn main() -> Result<(), eframe::Error> {
     let options = eframe::NativeOptions::default();
     eframe::run_native(
-        "Clicker Game Thingy",
+        "ClickyCrab",
         options,
         Box::new(|_cc| Ok(Box::new(MyApp::default()))),
     )
@@ -22,6 +23,9 @@ struct MyApp {
 }
 
 impl Default for MyApp {
+
+
+
     fn default() -> Self {
         Self {
             score: Arc::new(Mutex::new(0)),
@@ -33,8 +37,56 @@ impl Default for MyApp {
     }
 }
 
+
+impl MyApp {
+
+    fn arc_to_i32(&self) -> i32 {
+
+    let guard = self.score.lock().unwrap();
+
+    *guard
+    }
+
+
+    fn update_time(&mut self) {
+        let score_arc = Arc::clone(&self.score);
+        let x = self.x;
+        let upgd_cost = self.upgd_cost;
+
+        thread::spawn(move || {
+            loop {
+                println!("Send help send help send help Yasmina's holding me hostageeeeee");
+                thread::sleep(Duration::from_secs(1));
+                network();
+                let tx = network();
+                let current_score = {
+                    let guard = score_arc.lock().unwrap();
+                    *guard
+                };
+
+                send_score(tx, x, upgd_cost, current_score);
+            }
+        });
+    }
+
+
+
+
+}
+
+
+
+
+
 impl eframe::App for MyApp {
+
+
+
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        self.arc_to_i32();
+        self.update_time();
+
+
         egui::CentralPanel::default().show(ctx, |ui| {
             // Clone the style from the Arc and modify it
             let mut style = (*ctx.style()).clone();

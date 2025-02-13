@@ -52,26 +52,23 @@ impl MyApp {
         let score_arc = Arc::clone(&self.score);
         let x = self.x;
         let upgd_cost = self.upgd_cost;
+        let tx = network();
 
         thread::spawn(move || {
             loop {
                 println!("Send help send help send help Yasmina's holding me hostageeeeee");
                 thread::sleep(Duration::from_secs(1));
                 network();
-                let tx = network();
+                // let tx = network();
                 let current_score = {
                     let guard = score_arc.lock().unwrap();
                     *guard
                 };
 
-                send_score(tx, x, upgd_cost, current_score);
+                send_score(tx.clone(), x, upgd_cost, current_score);
             }
         });
     }
-
-
-
-
 }
 
 

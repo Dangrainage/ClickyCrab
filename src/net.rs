@@ -1,5 +1,3 @@
-pub mod networking {
-
 use std::thread::sleep;
 use std::thread;
 use std::net::UdpSocket;
@@ -13,8 +11,8 @@ pub fn network() -> Sender<Vec<i64>> {
     let tx: Sender<Vec<i64>> = tx.clone();
 
     thread::spawn( move || { 
-        let mut net_active = true;
-        while net_active {
+        let mut net_active = 1;
+        while net_active == 1 {
             let server_socket = UdpSocket::bind("0.0.0.0:0").unwrap();
             let target = "100.127.105.90:4000";
             let dat = rx.recv().unwrap();
@@ -27,7 +25,7 @@ pub fn network() -> Sender<Vec<i64>> {
             }
 
             if dat[0] == 0 { // code 0, kills thread
-                net_active = false;
+                net_active = 0;
 
             }
             if dat[0] == 1 {
@@ -74,5 +72,4 @@ pub fn debug(tx: Sender<Vec<i64>>) -> Sender<Vec<i64>> {
     tx
 }
 
-}
 

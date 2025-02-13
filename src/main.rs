@@ -58,7 +58,7 @@ impl MyApp {
             loop {
                 println!("Send help send help send help Yasmina's holding me hostageeeeee");
                 thread::sleep(Duration::from_secs(1));
-                network();
+                //network();
                 // let tx = network();
                 let current_score = {
                     let guard = score_arc.lock().unwrap();
